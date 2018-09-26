@@ -1,0 +1,3092 @@
+{
+	"info": {
+		"_postman_id": "df7eb836-468c-4bf6-9834-0d7f51ae7a00",
+		"name": "Users API V2_Smoke Test Cases - Integration Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "GIVEB-168 API: Error codes: Foundational Error Code work",
+			"item": [
+				{
+					"name": "v2/taxReceiptProfiles - validation code 1026",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8e7f292b-5c42-4592-9da3-32c24c413ec2",
+								"type": "text/javascript",
+								"exec": [
+									"// Create Random name for POST ",
+									"function generateName() {",
+									"    var uppercase = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";",
+									"    var lowercase = \"abcdefghijklmnopqrstuvwxyz\";",
+									"    var returnStr = '';",
+									"    var firstLetter = uppercase.charAt(Math.floor(Math.random() * uppercase.length));",
+									"",
+									"    for (var i = 0; i < 14; i++) {",
+									"        returnStr += lowercase.charAt(Math.floor(Math.random() * lowercase.length));",
+									"    }",
+									"    return firstLetter + returnStr;",
+									"}",
+									"pm.variables.set(\"randomName\", generateName());",
+									"",
+									"pm.variables.set(\"user_id\", 999010);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "35e5e731-de67-4083-b2eb-e4a27c81e7c7",
+								"type": "text/javascript",
+								"exec": [
+									"//Response in json format",
+									"var jsonData = pm.response.json();",
+									"",
+									"//Function to assert Json value with the expected value",
+									"function jsonValueCheck(testCase, jsonKey, expectedValue){",
+									"    pm.test(testCase, function () {",
+									"        pm.expect(jsonKey).to.eql(expectedValue);",
+									"    });",
+									"}",
+									"",
+									"try {",
+									"    //Status code check",
+									"    pm.test(\"Expecting status code to be 422\", function () {",
+									"        pm.response.to.have.status(422);",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The response should be a JSON\", typeof(jsonData), 'object');",
+									"    ",
+									"    pm.test(\"The response body should contain 'errors' key\", function () {",
+									"        pm.expect(pm.response.text()).to.include(\"errors\");",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The value of key 'title' should be 'wrong_length_other:2' for input where province has more than 2 characters\", jsonData.errors[0].title, \"wrong_length_other:2\");",
+									"    jsonValueCheck(\"The value of key 'ValidationCode' should be 1026 for input where province has more than 2 characters\", jsonData.errors[0].meta.validationCode, \"1026\");",
+									"    ",
+									"    ",
+									"} catch (e){",
+									"    console.log(e);",
+									"}",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth0_access_token_999010}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"taxReceiptProfiles"
+							]
+						},
+						"description": "Seeded user id - 999010 (api@chimp.net)\n\nSend a POST to /taxReceiptProfiles with four characters in Province field\n\nExpecting status code to be 422\n\nThe response time shoule be less than 500ms\n\nThe response should be a JSON\n\nThe response body should contain 'errors' key\n\nThe value of key 'title' should be 'wrong_length_other:2' for input where province has more than 2 characters\n\nThe value of key 'ValidationCode' should be 1026 for input where province has more than 2 characters"
+					},
+					"response": [
+						{
+							"name": "TaxReceiptProfile Error with characterLimit meta",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 Apr 2018 20:48:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "443052f8-da72-4fd0-b651-8313fe5ecbac",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.103210",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"wrong_length_other:2\",\"detail\":\"address.province - wrong_length_other:2\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1026\",\"characterLimit\":\"2\"}},{\"title\":\"inclusion\",\"detail\":\"address.province - inclusion\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1010\"}}]}"
+						},
+						{
+							"name": "Successfully create TaxReceiptProfile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{auth_token}}",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"Ben Gibbs\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"fund\",\n          \"id\": \"{{fund_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 11 Apr 2018 21:26:24 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-store, must-revalidate, private, max-age=0",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "location",
+									"value": "http://chimp.test/api/v2/taxReceiptProfiles/184",
+									"name": "location",
+									"description": "Used in redirection, or when a new resource has been created."
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-miniprofiler-ids",
+									"value": "[\"7shqolj1535cp8hbff0c\",\"pin1c7xg6x43b2iz8gsz\",\"t8a4h5kn1zjuqhrx8dmd\",\"3sywzbhju96pd80ja61c\",\"x85md131tmj4shpslwui\",\"4dp1ppib7usjbpxu9bsh\",\"27alvj9x6zn44t4z3khg\",\"557yl1gijha93kqwo74x\",\"mfudt0gk6rqjvlhitrl1\",\"g6o7fgj8ch1pnhrq9sm6\"]",
+									"name": "x-miniprofiler-ids",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "da33c36a-b85c-4149-b3b1-f50ee2ba71a2",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.368193",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\n    \"data\": {\n        \"id\": \"185\",\n        \"type\": \"taxReceiptProfiles\",\n        \"links\": {\n            \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185\"\n        },\n        \"attributes\": {\n            \"fullName\": \"Ben Gibbs\",\n            \"addressOne\": \"1250-1500 West Georgia St.\",\n            \"addressTwo\": null,\n            \"city\": \"Vancouver\",\n            \"province\": \"BC\",\n            \"postalCode\": \"V6G2Z6\",\n            \"country\": \"CA\",\n            \"accountNumber\": \"000000030000006G\"\n        },\n        \"relationships\": {\n            \"accountHoldable\": {\n                \"links\": {\n                    \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/relationships/accountHoldable\",\n                    \"related\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/accountHoldable\"\n                }\n            }\n        }\n    }\n}"
+						},
+						{
+							"name": "TaxReceiptProfile formatting error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e <> {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Van <>\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V7P 1W2\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 26 Apr 2018 23:41:58 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "30f2d843-cae4-458a-9a4b-7d4ade41c92e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.300435",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"invalid_formatting\",\"detail\":\"fullName - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/fullName\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}},{\"title\":\"invalid_formatting\",\"detail\":\"address.city - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.city\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}}]}"
+						}
+					]
+				},
+				{
+					"name": "v2/taxReceiptProfiles - validation code 1010",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8e7f292b-5c42-4592-9da3-32c24c413ec2",
+								"type": "text/javascript",
+								"exec": [
+									"// Create Random name for POST ",
+									"function generateName() {",
+									"    var uppercase = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";",
+									"    var lowercase = \"abcdefghijklmnopqrstuvwxyz\";",
+									"    var returnStr = '';",
+									"    var firstLetter = uppercase.charAt(Math.floor(Math.random() * uppercase.length));",
+									"",
+									"    for (var i = 0; i < 14; i++) {",
+									"        returnStr += lowercase.charAt(Math.floor(Math.random() * lowercase.length));",
+									"    }",
+									"    return firstLetter + returnStr;",
+									"}",
+									"pm.variables.set(\"randomName\", generateName());",
+									"",
+									"pm.variables.set(\"user_id\", 999010);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "b82a6717-acb5-45ac-be9f-9c7b08272224",
+								"type": "text/javascript",
+								"exec": [
+									"//Response in json format",
+									"var jsonData = pm.response.json();",
+									"",
+									"//Function to assert Json value with the expected value",
+									"function jsonValueCheck(testCase, jsonKey, expectedValue){",
+									"    pm.test(testCase, function () {",
+									"        pm.expect(jsonKey).to.eql(expectedValue);",
+									"    });",
+									"}",
+									"",
+									"try {",
+									"    //Status code check",
+									"    pm.test(\"Expecting status code to be 422\", function () {",
+									"        pm.response.to.have.status(422);",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The response should be a JSON\", typeof(jsonData), 'object');",
+									"    ",
+									"    pm.test(\"The response body should contain 'errors' key\", function () {",
+									"        pm.expect(pm.response.text()).to.include(\"errors\");",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The value of key 'title' should be 'inclusion' for input where province 'BC' does not match the country 'US'\", jsonData.errors[0].title, \"inclusion\");",
+									"    jsonValueCheck(\"The value of key 'ValidationCode' should be 1010 for input where province 'BC' does not match the country 'US'\", jsonData.errors[0].meta.validationCode, \"1010\");",
+									"    ",
+									"} catch (e){",
+									"    console.log(e);",
+									"}",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth0_access_token_999010}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"US\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"taxReceiptProfiles"
+							]
+						},
+						"description": "Seeded user id - 999010 (api@chimp.net)\n\nSend a POST to /taxReceiptProfiles where province does not belong to the Country keyed in\n\nExpecting status code to be 422\n\nThe response time shoule be less than 500ms\n\nThe response should be a JSON\n\nThe response body should contain 'errors' key\n\nThe value of key 'title' should be 'inclusion' for input where province 'BC' does not match the country 'US'\n\nThe value of key 'ValidationCode' should be 1010 for input where province 'BC' does not match the country 'US'"
+					},
+					"response": [
+						{
+							"name": "TaxReceiptProfile Error with characterLimit meta",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 Apr 2018 20:48:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "443052f8-da72-4fd0-b651-8313fe5ecbac",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.103210",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"wrong_length_other:2\",\"detail\":\"address.province - wrong_length_other:2\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1026\",\"characterLimit\":\"2\"}},{\"title\":\"inclusion\",\"detail\":\"address.province - inclusion\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1010\"}}]}"
+						},
+						{
+							"name": "TaxReceiptProfile formatting error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e <> {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Van <>\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V7P 1W2\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 26 Apr 2018 23:41:58 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "30f2d843-cae4-458a-9a4b-7d4ade41c92e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.300435",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"invalid_formatting\",\"detail\":\"fullName - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/fullName\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}},{\"title\":\"invalid_formatting\",\"detail\":\"address.city - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.city\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}}]}"
+						},
+						{
+							"name": "Successfully create TaxReceiptProfile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{auth_token}}",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"Ben Gibbs\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"fund\",\n          \"id\": \"{{fund_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 11 Apr 2018 21:26:24 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-store, must-revalidate, private, max-age=0",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "location",
+									"value": "http://chimp.test/api/v2/taxReceiptProfiles/184",
+									"name": "location",
+									"description": "Used in redirection, or when a new resource has been created."
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-miniprofiler-ids",
+									"value": "[\"7shqolj1535cp8hbff0c\",\"pin1c7xg6x43b2iz8gsz\",\"t8a4h5kn1zjuqhrx8dmd\",\"3sywzbhju96pd80ja61c\",\"x85md131tmj4shpslwui\",\"4dp1ppib7usjbpxu9bsh\",\"27alvj9x6zn44t4z3khg\",\"557yl1gijha93kqwo74x\",\"mfudt0gk6rqjvlhitrl1\",\"g6o7fgj8ch1pnhrq9sm6\"]",
+									"name": "x-miniprofiler-ids",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "da33c36a-b85c-4149-b3b1-f50ee2ba71a2",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.368193",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\n    \"data\": {\n        \"id\": \"185\",\n        \"type\": \"taxReceiptProfiles\",\n        \"links\": {\n            \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185\"\n        },\n        \"attributes\": {\n            \"fullName\": \"Ben Gibbs\",\n            \"addressOne\": \"1250-1500 West Georgia St.\",\n            \"addressTwo\": null,\n            \"city\": \"Vancouver\",\n            \"province\": \"BC\",\n            \"postalCode\": \"V6G2Z6\",\n            \"country\": \"CA\",\n            \"accountNumber\": \"000000030000006G\"\n        },\n        \"relationships\": {\n            \"accountHoldable\": {\n                \"links\": {\n                    \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/relationships/accountHoldable\",\n                    \"related\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/accountHoldable\"\n                }\n            }\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "v2/taxReceiptProfiles - validation code 1001",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8e7f292b-5c42-4592-9da3-32c24c413ec2",
+								"type": "text/javascript",
+								"exec": [
+									"// Create Random name for POST ",
+									"function generateName() {",
+									"    var uppercase = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";",
+									"    var lowercase = \"abcdefghijklmnopqrstuvwxyz\";",
+									"    var returnStr = '';",
+									"    var firstLetter = uppercase.charAt(Math.floor(Math.random() * uppercase.length));",
+									"",
+									"    for (var i = 0; i < 14; i++) {",
+									"        returnStr += lowercase.charAt(Math.floor(Math.random() * lowercase.length));",
+									"    }",
+									"    return firstLetter + returnStr;",
+									"}",
+									"pm.variables.set(\"randomName\", generateName());",
+									"",
+									"pm.variables.set(\"user_id\", 999010);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "629bd25f-e211-4277-8011-4b659fa384ef",
+								"type": "text/javascript",
+								"exec": [
+									"//Response in json format",
+									"var jsonData = pm.response.json();",
+									"",
+									"//Function to assert Json value with the expected value",
+									"function jsonValueCheck(testCase, jsonKey, expectedValue){",
+									"    pm.test(testCase, function () {",
+									"        pm.expect(jsonKey).to.eql(expectedValue);",
+									"    });",
+									"}",
+									"",
+									"try {",
+									"    //Status code check",
+									"    pm.test(\"Expecting status code to be 422\", function () {",
+									"        pm.response.to.have.status(422);",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The response should be a JSON\", typeof(jsonData), 'object');",
+									"    ",
+									"    pm.test(\"The response body should contain 'errors' key\", function () {",
+									"        pm.expect(pm.response.text()).to.include(\"errors\");",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The value of key 'title' should be 'blank' for input where 'fullName' is empty\", jsonData.errors[0].title, \"blank\");",
+									"    jsonValueCheck(\"The value of key 'ValidationCode' should be 1001 for input where 'fullName' is empty\", jsonData.errors[0].meta.validationCode, \"1001\");",
+									"    ",
+									"} catch (e){",
+									"    console.log(e);",
+									"}",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth0_access_token_999010}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"taxReceiptProfiles"
+							]
+						},
+						"description": "Seeded user id - 999010 (api@chimp.net)\n\nSend a POST to /taxReceiptProfiles with empty 'fullName'\n\n\nExpecting status code to be 422\n\nThe response time shoule be less than 500ms\n\nThe response should be a JSON\n\nThe response body should contain 'errors' key\n\nThe value of key 'title' should be 'blank' for input where 'fullName' is empty\n\nThe value of key 'ValidationCode' should be 1001 for input where 'fullName' is empty"
+					},
+					"response": [
+						{
+							"name": "TaxReceiptProfile formatting error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e <> {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Van <>\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V7P 1W2\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 26 Apr 2018 23:41:58 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "30f2d843-cae4-458a-9a4b-7d4ade41c92e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.300435",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"invalid_formatting\",\"detail\":\"fullName - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/fullName\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}},{\"title\":\"invalid_formatting\",\"detail\":\"address.city - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.city\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}}]}"
+						},
+						{
+							"name": "TaxReceiptProfile Error with characterLimit meta",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 Apr 2018 20:48:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "443052f8-da72-4fd0-b651-8313fe5ecbac",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.103210",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"wrong_length_other:2\",\"detail\":\"address.province - wrong_length_other:2\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1026\",\"characterLimit\":\"2\"}},{\"title\":\"inclusion\",\"detail\":\"address.province - inclusion\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1010\"}}]}"
+						},
+						{
+							"name": "Successfully create TaxReceiptProfile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{auth_token}}",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"Ben Gibbs\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"fund\",\n          \"id\": \"{{fund_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 11 Apr 2018 21:26:24 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-store, must-revalidate, private, max-age=0",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "location",
+									"value": "http://chimp.test/api/v2/taxReceiptProfiles/184",
+									"name": "location",
+									"description": "Used in redirection, or when a new resource has been created."
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-miniprofiler-ids",
+									"value": "[\"7shqolj1535cp8hbff0c\",\"pin1c7xg6x43b2iz8gsz\",\"t8a4h5kn1zjuqhrx8dmd\",\"3sywzbhju96pd80ja61c\",\"x85md131tmj4shpslwui\",\"4dp1ppib7usjbpxu9bsh\",\"27alvj9x6zn44t4z3khg\",\"557yl1gijha93kqwo74x\",\"mfudt0gk6rqjvlhitrl1\",\"g6o7fgj8ch1pnhrq9sm6\"]",
+									"name": "x-miniprofiler-ids",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "da33c36a-b85c-4149-b3b1-f50ee2ba71a2",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.368193",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\n    \"data\": {\n        \"id\": \"185\",\n        \"type\": \"taxReceiptProfiles\",\n        \"links\": {\n            \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185\"\n        },\n        \"attributes\": {\n            \"fullName\": \"Ben Gibbs\",\n            \"addressOne\": \"1250-1500 West Georgia St.\",\n            \"addressTwo\": null,\n            \"city\": \"Vancouver\",\n            \"province\": \"BC\",\n            \"postalCode\": \"V6G2Z6\",\n            \"country\": \"CA\",\n            \"accountNumber\": \"000000030000006G\"\n        },\n        \"relationships\": {\n            \"accountHoldable\": {\n                \"links\": {\n                    \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/relationships/accountHoldable\",\n                    \"related\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/accountHoldable\"\n                }\n            }\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "v2/taxReceiptProfiles - expecting error 'There was a problem in the JSON you submitted'",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8e7f292b-5c42-4592-9da3-32c24c413ec2",
+								"type": "text/javascript",
+								"exec": [
+									"// Create Random name for POST ",
+									"function generateName() {",
+									"    var uppercase = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";",
+									"    var lowercase = \"abcdefghijklmnopqrstuvwxyz\";",
+									"    var returnStr = '';",
+									"    var firstLetter = uppercase.charAt(Math.floor(Math.random() * uppercase.length));",
+									"",
+									"    for (var i = 0; i < 14; i++) {",
+									"        returnStr += lowercase.charAt(Math.floor(Math.random() * lowercase.length));",
+									"    }",
+									"    return firstLetter + returnStr;",
+									"}",
+									"pm.variables.set(\"randomName\", generateName());",
+									"",
+									"pm.variables.set(\"user_id\", 999010);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "2600dbac-baee-47d8-93d2-e13ea7afa59d",
+								"type": "text/javascript",
+								"exec": [
+									"//Response in json format",
+									"var jsonData = pm.response.json();",
+									"",
+									"//Function to assert Json value with the expected value",
+									"function jsonValueCheck(testCase, jsonKey, expectedValue){",
+									"    pm.test(testCase, function () {",
+									"        pm.expect(jsonKey).to.eql(expectedValue);",
+									"    });",
+									"}",
+									"",
+									"try {",
+									"    //Status code check",
+									"    pm.test(\"Expecting status code to be 400\", function () {",
+									"        pm.response.to.have.status(400);",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The response should be a JSON\", typeof(jsonData), 'object');",
+									"    ",
+									"    pm.test(\"The response body should contain 'errors' key\", function () {",
+									"        pm.expect(pm.response.text()).to.include(\"errors\");",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The value of key 'title' should be 'There was a problem in the JSON you submitted' for input where value for key 'province' is missing\", jsonData.errors[0].title, \"There was a problem in the JSON you submitted\");",
+									"    ",
+									"} catch (e){",
+									"    console.log(e);",
+									"}",
+									"",
+									"",
+									"",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth0_access_token_999010}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\":  ,\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"taxReceiptProfiles"
+							]
+						},
+						"description": "Seeded user id - 999010 (api@chimp.net)\n\nSend a POST to /taxReceiptProfiles where value for key 'province' is missing in request body\n\nExpecting status code to be 422\n\nThe response time shoule be less than 500ms\n\nThe response should be a JSON\n\nThe response body should contain 'errors' key\n\nThe value of key 'title' should be 'blank' for input where value for key 'province' is missing\n\nThe value of key 'ValidationCode' should be 1001 for input where value for key 'province' is missing"
+					},
+					"response": [
+						{
+							"name": "TaxReceiptProfile Error with characterLimit meta",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 Apr 2018 20:48:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "443052f8-da72-4fd0-b651-8313fe5ecbac",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.103210",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"wrong_length_other:2\",\"detail\":\"address.province - wrong_length_other:2\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1026\",\"characterLimit\":\"2\"}},{\"title\":\"inclusion\",\"detail\":\"address.province - inclusion\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1010\"}}]}"
+						},
+						{
+							"name": "Successfully create TaxReceiptProfile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{auth_token}}",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"Ben Gibbs\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"fund\",\n          \"id\": \"{{fund_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 11 Apr 2018 21:26:24 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-store, must-revalidate, private, max-age=0",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "location",
+									"value": "http://chimp.test/api/v2/taxReceiptProfiles/184",
+									"name": "location",
+									"description": "Used in redirection, or when a new resource has been created."
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-miniprofiler-ids",
+									"value": "[\"7shqolj1535cp8hbff0c\",\"pin1c7xg6x43b2iz8gsz\",\"t8a4h5kn1zjuqhrx8dmd\",\"3sywzbhju96pd80ja61c\",\"x85md131tmj4shpslwui\",\"4dp1ppib7usjbpxu9bsh\",\"27alvj9x6zn44t4z3khg\",\"557yl1gijha93kqwo74x\",\"mfudt0gk6rqjvlhitrl1\",\"g6o7fgj8ch1pnhrq9sm6\"]",
+									"name": "x-miniprofiler-ids",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "da33c36a-b85c-4149-b3b1-f50ee2ba71a2",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.368193",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\n    \"data\": {\n        \"id\": \"185\",\n        \"type\": \"taxReceiptProfiles\",\n        \"links\": {\n            \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185\"\n        },\n        \"attributes\": {\n            \"fullName\": \"Ben Gibbs\",\n            \"addressOne\": \"1250-1500 West Georgia St.\",\n            \"addressTwo\": null,\n            \"city\": \"Vancouver\",\n            \"province\": \"BC\",\n            \"postalCode\": \"V6G2Z6\",\n            \"country\": \"CA\",\n            \"accountNumber\": \"000000030000006G\"\n        },\n        \"relationships\": {\n            \"accountHoldable\": {\n                \"links\": {\n                    \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/relationships/accountHoldable\",\n                    \"related\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/accountHoldable\"\n                }\n            }\n        }\n    }\n}"
+						},
+						{
+							"name": "TaxReceiptProfile formatting error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e <> {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Van <>\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V7P 1W2\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 26 Apr 2018 23:41:58 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "30f2d843-cae4-458a-9a4b-7d4ade41c92e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.300435",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"invalid_formatting\",\"detail\":\"fullName - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/fullName\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}},{\"title\":\"invalid_formatting\",\"detail\":\"address.city - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.city\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}}]}"
+						}
+					]
+				},
+				{
+					"name": "v2/taxReceiptProfiles - creating taxReceiptProfile successful",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8e7f292b-5c42-4592-9da3-32c24c413ec2",
+								"type": "text/javascript",
+								"exec": [
+									"// Create Random name for POST ",
+									"function generateName() {",
+									"    var uppercase = \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\";",
+									"    var lowercase = \"abcdefghijklmnopqrstuvwxyz\";",
+									"    var returnStr = '';",
+									"    var firstLetter = uppercase.charAt(Math.floor(Math.random() * uppercase.length));",
+									"",
+									"    for (var i = 0; i < 14; i++) {",
+									"        returnStr += lowercase.charAt(Math.floor(Math.random() * lowercase.length));",
+									"    }",
+									"    return firstLetter + returnStr;",
+									"}",
+									"pm.variables.set(\"randomName\", generateName());",
+									"",
+									"pm.variables.set(\"user_id\", 999010);",
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c2e126c0-ad33-4e14-babf-3792a3de067d",
+								"type": "text/javascript",
+								"exec": [
+									"//Response in json format",
+									"var jsonData = pm.response.json();",
+									"",
+									"//Function to assert Json value with the expected value",
+									"function jsonValueCheck(testCase, jsonKey, expectedValue){",
+									"    pm.test(testCase, function () {",
+									"        pm.expect(jsonKey).to.eql(expectedValue);",
+									"    });",
+									"}",
+									"",
+									"var schema = {",
+									"  \"$schema\": \"http://json-schema.org/draft-04/schema#\",",
+									"  \"type\": \"object\",",
+									"  \"properties\": {",
+									"    \"data\": {",
+									"      \"type\": \"object\",",
+									"      \"properties\": {",
+									"        \"id\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"type\": {",
+									"          \"type\": \"string\"",
+									"        },",
+									"        \"links\": {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"self\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [\"self\"]",
+									"        },",
+									"        \"attributes\": {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"fullName\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"addressOne\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"addressTwo\": {",
+									"              \"type\": \"null\"",
+									"            },",
+									"            \"city\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"province\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"postalCode\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"country\": {",
+									"              \"type\": \"string\"",
+									"            },",
+									"            \"accountNumber\": {",
+									"              \"type\": \"string\"",
+									"            }",
+									"          },",
+									"          \"required\": [\"fullName\",\"addressOne\",\"addressTwo\",\"city\",\"province\",\"postalCode\",\"country\",\"accountNumber\"]",
+									"        },",
+									"        \"relationships\": {",
+									"          \"type\": \"object\",",
+									"          \"properties\": {",
+									"            \"accountHoldable\": {",
+									"              \"type\": \"object\",",
+									"              \"properties\": {",
+									"                \"links\": {",
+									"                  \"type\": \"object\",",
+									"                  \"properties\": {",
+									"                    \"self\": {",
+									"                      \"type\": \"string\"",
+									"                    },",
+									"                    \"related\": {",
+									"                      \"type\": \"string\"",
+									"                    }",
+									"                  },",
+									"                  \"required\": [\"self\",\"related\"]",
+									"                }",
+									"              },",
+									"              \"required\": [\"links\"]",
+									"            }",
+									"          },",
+									"          \"required\": [\"accountHoldable\"]",
+									"        }",
+									"      },",
+									"      \"required\": [\"id\",\"type\",\"links\",\"attributes\",\"relationships\"]",
+									"    }",
+									"  },",
+									"  \"required\": [\"data\"]",
+									"}",
+									"",
+									"try {",
+									"    //Status code check",
+									"    pm.test(\"Expecting status code to be 201\", function () {",
+									"        pm.response.to.have.status(201);",
+									"    });",
+									"    ",
+									"    jsonValueCheck(\"The response should be a JSON\", typeof(jsonData), 'object');",
+									"    ",
+									"    jsonValueCheck(\"The response should match the expected schema and should contain expected keys\", tv4.validate(jsonData, schema), true);",
+									"    ",
+									"    jsonValueCheck(\"The value of key 'type' should be 'taxReceiptProfiles'\", jsonData.data.type, \"taxReceiptProfiles\");",
+									"    ",
+									"} catch (e){",
+									"    console.log(e);",
+									"}",
+									""
+								]
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/vnd.api+json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{auth0_access_token_999010}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+							"host": [
+								"{{api_host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"taxReceiptProfiles"
+							]
+						},
+						"description": "Seeded user id - 999010 (api@chimp.net)\n\nSend a POST to /taxReceiptProfiles with valid details\n\nExpecting status code to be 201\n\nThe response time shoule be less than 500ms\n\nThe response should be a JSON\n\nThe response should match the expected schema and should contain expected keys\n\nThe value of key 'type' should be 'taxReceiptProfiles'"
+					},
+					"response": [
+						{
+							"name": "TaxReceiptProfile Error with characterLimit meta",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BCBC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Mon, 23 Apr 2018 20:48:36 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "443052f8-da72-4fd0-b651-8313fe5ecbac",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.103210",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"wrong_length_other:2\",\"detail\":\"address.province - wrong_length_other:2\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1026\",\"characterLimit\":\"2\"}},{\"title\":\"inclusion\",\"detail\":\"address.province - inclusion\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.province\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"1010\"}}]}"
+						},
+						{
+							"name": "Successfully create TaxReceiptProfile",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "{{auth_token}}",
+										"disabled": true
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"Ben Gibbs\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Vancouver\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V6G 2Z6\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"fund\",\n          \"id\": \"{{fund_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Wed, 11 Apr 2018 21:26:24 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-store, must-revalidate, private, max-age=0",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "location",
+									"value": "http://chimp.test/api/v2/taxReceiptProfiles/184",
+									"name": "location",
+									"description": "Used in redirection, or when a new resource has been created."
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-miniprofiler-ids",
+									"value": "[\"7shqolj1535cp8hbff0c\",\"pin1c7xg6x43b2iz8gsz\",\"t8a4h5kn1zjuqhrx8dmd\",\"3sywzbhju96pd80ja61c\",\"x85md131tmj4shpslwui\",\"4dp1ppib7usjbpxu9bsh\",\"27alvj9x6zn44t4z3khg\",\"557yl1gijha93kqwo74x\",\"mfudt0gk6rqjvlhitrl1\",\"g6o7fgj8ch1pnhrq9sm6\"]",
+									"name": "x-miniprofiler-ids",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "da33c36a-b85c-4149-b3b1-f50ee2ba71a2",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.368193",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\n    \"data\": {\n        \"id\": \"185\",\n        \"type\": \"taxReceiptProfiles\",\n        \"links\": {\n            \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185\"\n        },\n        \"attributes\": {\n            \"fullName\": \"Ben Gibbs\",\n            \"addressOne\": \"1250-1500 West Georgia St.\",\n            \"addressTwo\": null,\n            \"city\": \"Vancouver\",\n            \"province\": \"BC\",\n            \"postalCode\": \"V6G2Z6\",\n            \"country\": \"CA\",\n            \"accountNumber\": \"000000030000006G\"\n        },\n        \"relationships\": {\n            \"accountHoldable\": {\n                \"links\": {\n                    \"self\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/relationships/accountHoldable\",\n                    \"related\": \"http://chimp.test/api/v2/taxReceiptProfiles/185/accountHoldable\"\n                }\n            }\n        }\n    }\n}"
+						},
+						{
+							"name": "TaxReceiptProfile formatting error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Accept",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Content-Type",
+										"value": "application/vnd.api+json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Token 999000"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"data\": {\n    \"type\": \"taxReceiptProfiles\",\n    \"attributes\": {\n      \"fullName\": \"TRP_e2e <> {{randomName}}\",\n      \"addressOne\": \"1250-1500 West Georgia St.\",\n      \"city\": \"Van <>\",\n      \"province\": \"BC\",\n      \"country\": \"CA\",\n      \"postalCode\": \"V7P 1W2\"\n    },\n    \"relationships\": {\n      \"accountHoldable\": {\n        \"data\": {\n          \"type\": \"user\",\n          \"id\": \"{{user_id}}\"\n        }\n      }\n    }\n  }\n}"
+								},
+								"url": {
+									"raw": "{{api_host}}/api/v2/taxReceiptProfiles",
+									"host": [
+										"{{api_host}}"
+									],
+									"path": [
+										"api",
+										"v2",
+										"taxReceiptProfiles"
+									]
+								}
+							},
+							"status": "Unprocessable Entity",
+							"code": 422,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Connection",
+									"value": "keep-alive",
+									"name": "Connection",
+									"description": "Options that are desired for the connection"
+								},
+								{
+									"key": "Date",
+									"value": "Thu, 26 Apr 2018 23:41:58 GMT",
+									"name": "Date",
+									"description": "The date and time that the message was sent"
+								},
+								{
+									"key": "cache-control",
+									"value": "no-cache",
+									"name": "cache-control",
+									"description": "Tells all caching mechanisms from server to client whether they may cache this object. It is measured in seconds"
+								},
+								{
+									"key": "content-type",
+									"value": "application/vnd.api+json; charset=utf-8",
+									"name": "content-type",
+									"description": "The mime type of this content"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "set-cookie",
+									"value": "__profilin=p%3Dt; path=/",
+									"name": "set-cookie",
+									"description": "an HTTP cookie"
+								},
+								{
+									"key": "transfer-encoding",
+									"value": "chunked",
+									"name": "transfer-encoding",
+									"description": "The form of encoding used to safely transfer the entity to the user. Currently defined methods are: chunked, compress, deflate, gzip, identity."
+								},
+								{
+									"key": "vary",
+									"value": "Origin",
+									"name": "vary",
+									"description": "Tells downstream proxies how to match future request headers to decide whether the cached response can be used rather than requesting a fresh one from the origin server."
+								},
+								{
+									"key": "x-content-type-options",
+									"value": "nosniff",
+									"name": "x-content-type-options",
+									"description": "The only defined value, \"nosniff\", prevents Internet Explorer from MIME-sniffing a response away from the declared content-type"
+								},
+								{
+									"key": "x-frame-options",
+									"value": "SAMEORIGIN",
+									"name": "x-frame-options",
+									"description": "Clickjacking protection: \"deny\" - no rendering within a frame, \"sameorigin\" - no rendering if origin mismatch"
+								},
+								{
+									"key": "x-meta-request-version",
+									"value": "0.4.3",
+									"name": "x-meta-request-version",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-request-id",
+									"value": "30f2d843-cae4-458a-9a4b-7d4ade41c92e",
+									"name": "x-request-id",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-runtime",
+									"value": "0.300435",
+									"name": "x-runtime",
+									"description": "Custom header"
+								},
+								{
+									"key": "x-xss-protection",
+									"value": "1; mode=block",
+									"name": "x-xss-protection",
+									"description": "Cross-site scripting (XSS) filter"
+								}
+							],
+							"cookie": [
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "p%3Dt",
+									"key": "__profilin"
+								},
+								{
+									"expires": "Invalid Date",
+									"httpOnly": false,
+									"domain": "chimp.test",
+									"path": "/",
+									"secure": false,
+									"value": "POST",
+									"key": "request_method"
+								}
+							],
+							"body": "{\"errors\":[{\"title\":\"invalid_formatting\",\"detail\":\"fullName - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/fullName\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}},{\"title\":\"invalid_formatting\",\"detail\":\"address.city - invalid_formatting\",\"code\":\"100\",\"source\":{\"pointer\":\"/data/attributes/address.city\"},\"status\":\"422\",\"meta\":{\"validationCode\":\"2500\"}}]}"
+						}
+					]
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "05b7d257-3be1-4755-9477-c5ee840a4766",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "6b6ae424-363d-4d82-a018-d70666225178",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "3aaaa779-e8a6-4eb6-a897-e76a487dadfa",
+				"type": "text/javascript",
+				"exec": [
+					"//Access token for user id - 999000",
+					"",
+					"pm.sendRequest({",
+					"    url: pm.environment.get(\"auth0_token_url\"),",
+					"    method: 'POST',",
+					"    header: [",
+					"        'Content-Type: application/x-www-form-urlencoded'",
+					"    ],",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: \"grant_type\", value: \"password\", disabled: false},",
+					"            {key: \"client_id\", value: \"nflJDPtqECgZfeCSahw86tgDAOVhBQ74\", disabled: false},",
+					"            {key: \"audience\", value: \"https://lab.24467.org/api/v2/\", disabled: false},",
+					"            {key: \"username\", value: \"api@chimp.net\", disabled: false},",
+					"            {key: \"password\", value: \"GiveAndLetGive!123\", disabled: false},",
+					"            {key: \"scope\", value:\"openid\",disabled: false}",
+					"        ]",
+					"    }",
+					"}, function (err, res) {",
+					"    if (res.json().error) {",
+					"        console.log(\"### ERROR - There was a problem getting the stripe token. Check console for details.\");",
+					"    } else {",
+					"        pm.variables.set(\"auth0_access_token_999000\", res.json().access_token);",
+					"        console.log(\"999000 - You got a access_token of: \" + pm.variables.get(\"auth0_access_token_999000\"));    ",
+					"    }",
+					"});",
+					"",
+					"//Access token for user id - 999010",
+					"pm.sendRequest({",
+					"    url: pm.environment.get(\"auth0_token_url\"),",
+					"    method: 'POST',",
+					"    header: [",
+					"        'Content-Type: application/x-www-form-urlencoded'",
+					"    ],",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: \"grant_type\", value: \"password\", disabled: false},",
+					"            {key: \"client_id\", value: \"nflJDPtqECgZfeCSahw86tgDAOVhBQ74\", disabled: false},",
+					"            {key: \"audience\", value: \"https://lab.24467.org/api/v2/\", disabled: false},",
+					"            {key: \"username\", value: \"api_2@chimp.net\", disabled: false},",
+					"            {key: \"password\", value: \"GiveAndLetGive!123\", disabled: false},",
+					"            {key: \"scope\", value:\"openid\",disabled: false}",
+					"        ]",
+					"    }",
+					"}, function (err, res) {",
+					"    if (res.json().error) {",
+					"        console.log(\"### ERROR - There was a problem getting the access token. Check console for details.\");",
+					"    } else {",
+					"        pm.variables.set(\"auth0_access_token_999010\", res.json().access_token);",
+					"        console.log(\"999010 - You got a access_token of: \" + pm.variables.get(\"auth0_access_token_999010\"));    ",
+					"    }",
+					"});",
+					"",
+					"//Access token for user id - 999030",
+					"pm.sendRequest({",
+					"    url: pm.environment.get(\"auth0_token_url\"),",
+					"    method: 'POST',",
+					"    header: [",
+					"        'Content-Type: application/x-www-form-urlencoded'",
+					"    ],",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: \"grant_type\", value: \"password\", disabled: false},",
+					"            {key: \"client_id\", value: \"nflJDPtqECgZfeCSahw86tgDAOVhBQ74\", disabled: false},",
+					"            {key: \"audience\", value: \"https://lab.24467.org/api/v2/\", disabled: false},",
+					"            {key: \"username\", value: \"api_4@chimp.net\", disabled: false},",
+					"            {key: \"password\", value: \"GiveAndLetGive!123\", disabled: false},",
+					"            {key: \"scope\", value:\"openid\",disabled: false}",
+					"        ]",
+					"    }",
+					"}, function (err, res) {",
+					"    if (res.json().error) {",
+					"        console.log(\"### ERROR - There was a problem getting the access token. Check console for details.\");",
+					"    } else {",
+					"        pm.variables.set(\"auth0_access_token_999030\", res.json().access_token);",
+					"        console.log(\"999030 - You got a access_token of: \" + pm.variables.get(\"auth0_access_token_999030\"));    ",
+					"    }",
+					"});",
+					"",
+					"//Access token for user id - 31",
+					"pm.sendRequest({",
+					"    url: pm.environment.get(\"auth0_token_url\"),",
+					"    method: 'POST',",
+					"    header: [",
+					"        'Content-Type: application/x-www-form-urlencoded'",
+					"    ],",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: \"grant_type\", value: \"password\", disabled: false},",
+					"            {key: \"client_id\", value: \"nflJDPtqECgZfeCSahw86tgDAOVhBQ74\", disabled: false},",
+					"            {key: \"audience\", value: \"https://lab.24467.org/api/v2/\", disabled: false},",
+					"            {key: \"username\", value: \"admin@chimp.net\", disabled: false},",
+					"            {key: \"password\", value: \"GiveAndLetGive!123\", disabled: false},",
+					"            {key: \"scope\", value:\"openid\",disabled: false}",
+					"        ]",
+					"    }",
+					"}, function (err, res) {",
+					"    if (res.json().error) {",
+					"        console.log(\"### ERROR - There was a problem getting the stripe token. Check console for details.\");",
+					"    } else {",
+					"        pm.variables.set(\"auth0_access_token_31\", res.json().access_token);",
+					"        console.log(\"31 - You got a access_token of: \" + pm.variables.get(\"auth0_access_token_31\"));    ",
+					"    }",
+					"});",
+					"",
+					"",
+					"//Access token for user id - 999020",
+					"pm.sendRequest({",
+					"    url: pm.environment.get(\"auth0_token_url\"),",
+					"    method: 'POST',",
+					"    header: [",
+					"        'Content-Type: application/x-www-form-urlencoded'",
+					"    ],",
+					"    body: {",
+					"        mode: 'urlencoded',",
+					"        urlencoded: [",
+					"            {key: \"grant_type\", value: \"password\", disabled: false},",
+					"            {key: \"client_id\", value: \"nflJDPtqECgZfeCSahw86tgDAOVhBQ74\", disabled: false},",
+					"            {key: \"audience\", value: \"https://lab.24467.org/api/v2/\", disabled: false},",
+					"            {key: \"username\", value: \"api_3@chimp.net\", disabled: false},",
+					"            {key: \"password\", value: \"GiveAndLetGive!123\", disabled: false},",
+					"            {key: \"scope\", value:\"openid\",disabled: false}",
+					"        ]",
+					"    }",
+					"}, function (err, res) {",
+					"    if (res.json().error) {",
+					"        console.log(\"### ERROR - There was a problem getting the stripe token. Check console for details.\");",
+					"    } else {",
+					"        pm.variables.set(\"auth0_access_token_999020\", res.json().access_token);",
+					"        console.log(\"999020 - You got a access_token of: \" + pm.variables.get(\"auth0_access_token_999020\"));    ",
+					"    }",
+					"});",
+					"",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "45c04f49-63ec-461e-99ac-04c948155051",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
